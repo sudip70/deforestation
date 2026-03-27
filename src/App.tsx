@@ -63,7 +63,7 @@ export default function App() {
   const minYear = data?.years[0] ?? 1990;
   const maxYear = data?.years[data.years.length - 1] ?? 2025;
 
-  const [year, setYear] = useState(2000);
+  const [year, setYear] = useState(2025);
   const [playing, setPlaying] = useState(false);
   const [selectedCode, setSelectedCode] = useState<string | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
