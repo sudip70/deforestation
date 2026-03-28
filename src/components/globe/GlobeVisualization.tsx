@@ -135,7 +135,7 @@ export function GlobeVisualization({
         polygonAltitude={getAltitude}
         polygonCapColor={getColor}
         polygonSideColor={() => 'rgba(0,0,0,0.7)'}
-        polygonStrokeColor={() => 'rgba(34,197,94,0.08)'}
+        polygonStrokeColor={() => 'rgba(12, 12, 12, 0.6)'}
         polygonLabel={getLabel}
         onPolygonClick={handlePolygonClick}
         polygonsTransitionDuration={400}
