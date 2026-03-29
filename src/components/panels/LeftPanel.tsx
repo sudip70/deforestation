@@ -1,74 +1,92 @@
+import { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { PanelShell } from '../ui/PanelShell';
 import { PanelLabel } from '../ui/PanelLabel';
 import { SectionDivider } from '../ui/SectionDivider';
 import { StatBlock } from '../ui/StatBlock';
+import { getLayerStats } from '../../utils/layerStats.ts';
+import { LAYER_MAP } from '../../config/layers';
+import type { ProcessedData, LayerId } from '../../types';
 
 interface Props {
-  coverage: string;
-  lostSince2000: string;
-  lossBarWidth: number;
-  coverageBarWidth: number;
+  activeLayer: LayerId;
+  data: ProcessedData | null;
+  year: number;
 }
 
-export function LeftPanel({ coverage, lostSince2000, lossBarWidth, coverageBarWidth }: Props) {
+export function LeftPanel({ activeLayer, data, year }: Props) {
+  const config = LAYER_MAP.get(activeLayer)!;
+
+  const stats = useMemo(() => {
+    if (!data) return null;
+    return getLayerStats(activeLayer, data, year);
+  }, [activeLayer, data, year]);
+
   return (
-    // Outer div owns the fixed centering — untouched by framer-motion
-    <div
-      style={{
-        position: 'fixed',
-        left: '20px',
-        top: '50%',
-        transform: 'translateY(-50%)',
-        zIndex: 20,
-      }}
-    >
-      {/* Inner motion element owns only the slide-in animation */}
+    <div style={{
+      position: 'fixed', left: '20px', top: '50%',
+      transform: 'translateY(-50%)', zIndex: 20,
+    }}>
       <motion.aside
+        key={activeLayer}
         initial={{ x: -20, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
-        transition={{ delay: 0.5 }}
+        exit={{ x: -20, opacity: 0 }}
+        transition={{ duration: 0.25 }}
       >
         <PanelShell style={{ width: '172px' }}>
           <div style={{ marginBottom: '18px' }}>
-            <PanelLabel>Forest Coverage</PanelLabel>
+            <PanelLabel>
+              {config.emoji} {config.label}
+            </PanelLabel>
             <div style={{ marginTop: '8px' }}>
               <SectionDivider gradient />
             </div>
           </div>
 
-          <StatBlock
-            value={coverage}
-            unit="%"
-            label="Global Coverage"
-            color="#4ade80"
-            barWidth={coverageBarWidth}
-            barColor="linear-gradient(to right, #15803d, #4ade80)"
-          />
+          {stats ? (
+            <>
+              <StatBlock
+                value={stats.primary.value}
+                unit={stats.primary.unit}
+                label={stats.primary.label}
+                color={stats.primary.color}
+                barWidth={stats.primary.barWidth}
+                barColor={stats.primary.barColor}
+              />
 
-          <div style={{ margin: '16px 0' }}>
-            <SectionDivider />
-          </div>
+              <div style={{ margin: '14px 0' }}>
+                <SectionDivider />
+              </div>
 
-          <StatBlock
-            value={lostSince2000}
-            unit="M km²"
-            label="Lost Since 2000"
-            color="#f87171"
-            barWidth={lossBarWidth}
-            barColor="linear-gradient(to right, #dc2626, #f87171)"
-          />
+              <StatBlock
+                value={stats.secondary.value}
+                unit={stats.secondary.unit}
+                label={stats.secondary.label}
+                color={stats.secondary.color}
+                barWidth={stats.secondary.barWidth}
+                barColor={stats.secondary.barColor}
+              />
 
-          <div style={{ margin: '16px 0' }}>
-            <SectionDivider />
-          </div>
+              <div style={{ margin: '14px 0' }}>
+                <SectionDivider />
+              </div>
 
-          <StatBlock
-            value="~200K"
-            unit="km²"
-            label="Avg Annual Loss"
-            color="#fb923c"
-          />
+              <StatBlock
+                value={stats.tertiary.value}
+                unit={stats.tertiary.unit}
+                label={stats.tertiary.label}
+                color={stats.tertiary.color}
+              />
+            </>
+          ) : (
+            <div style={{
+              fontFamily: 'var(--font-mono)', fontSize: '9px',
+              color: 'rgba(226,232,240,0.3)', letterSpacing: '1px',
+            }}>
+              Loading...
+            </div>
+          )}
         </PanelShell>
       </motion.aside>
     </div>

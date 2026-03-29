@@ -16,40 +16,81 @@ export function Header({ year }: Props) {
         left: 0,
         right: 0,
         zIndex: 30,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
         padding: '20px 28px 0',
       }}
     >
-      {/* Brand */}
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '9px',
-          fontFamily: 'var(--font-mono)',
-          fontSize: '11px',
-          letterSpacing: '2px',
-          color: 'rgba(226,232,240,0.55)',
-          textTransform: 'uppercase',
-        }}
-      >
-        <span
+      {/* Left + right anchored with flexbox, center absolutely positioned */}
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+        {/* Brand — left */}
+        <div
           style={{
-            width: '7px',
-            height: '7px',
-            borderRadius: '50%',
-            background: '#22c55e',
-            boxShadow: '0 0 8px #22c55e',
-            flexShrink: 0,
+            display: 'flex',
+            alignItems: 'center',
+            gap: '9px',
+            fontFamily: 'var(--font-mono)',
+            fontSize: '11px',
+            letterSpacing: '2px',
+            color: 'rgba(226,232,240,0.55)',
+            textTransform: 'uppercase',
+            paddingTop: '6px',
           }}
-        />
-        Earth Observatory
+        >
+          <span
+            style={{
+              width: '7px',
+              height: '7px',
+              borderRadius: '50%',
+              background: '#22c55e',
+              boxShadow: '0 0 8px #22c55e',
+              flexShrink: 0,
+            }}
+          />
+          Earth Observatory
+        </div>
+
+        {/* Live badge — right */}
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '7px',
+            fontFamily: 'var(--font-mono)',
+            fontSize: '10px',
+            letterSpacing: '2px',
+            color: '#22c55e',
+            border: '1px solid rgba(34,197,94,0.3)',
+            padding: '5px 12px',
+            borderRadius: '20px',
+            background: 'rgba(34,197,94,0.06)',
+          }}
+        >
+          <span
+            className="pulse-dot"
+            style={{
+              width: '6px',
+              height: '6px',
+              borderRadius: '50%',
+              background: '#22c55e',
+              flexShrink: 0,
+            }}
+          />
+          LIVE DATA
+        </div>
       </div>
 
-      {/* Year display */}
-      <div style={{ textAlign: 'center' }}>
+      {/* Year — truly centered via absolute */}
+      <div
+        style={{
+          position: 'absolute',
+          top: '20px',
+          left: 0,
+          right: 0,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          pointerEvents: 'none',
+        }}
+      >
         <div
           style={{
             fontFamily: 'var(--font-mono)',
@@ -76,35 +117,6 @@ export function Header({ year }: Props) {
         >
           {year}
         </div>
-      </div>
-
-      {/* Live badge */}
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '7px',
-          fontFamily: 'var(--font-mono)',
-          fontSize: '10px',
-          letterSpacing: '2px',
-          color: '#22c55e',
-          border: '1px solid rgba(34,197,94,0.3)',
-          padding: '5px 12px',
-          borderRadius: '20px',
-          background: 'rgba(34,197,94,0.06)',
-        }}
-      >
-        <span
-          className="pulse-dot"
-          style={{
-            width: '6px',
-            height: '6px',
-            borderRadius: '50%',
-            background: '#22c55e',
-            flexShrink: 0,
-          }}
-        />
-        LIVE DATA
       </div>
     </motion.header>
   );

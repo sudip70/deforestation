@@ -1,14 +1,16 @@
-import { useState, useMemo, useEffect, useRef } from 'react';
+import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { useDataLoader } from './hooks/useDataLoader';
-import { getDataForYear, getGlobalStats } from './utils/dataParser';
+import { getDataForYear } from './utils/dataParser';
 import { GlobeVisualization } from './components/globe/GlobeVisualization';
 import { Header } from './components/Header';
 import { LeftPanel } from './components/panels/LeftPanel';
 import { RightPanel } from './components/panels/RightPanel';
 import { Controls } from './components/controls/Controls';
 import { CountryDetailPanel } from './components/panels/CountryDetailPanel';
-import type { SelectedCountry } from './types';
+import { ErrorOverlay } from './components/ErrorOverlay';
+import { POPULATION_PROJECTION_START } from './config/layers';
+import type { SelectedCountry, LayerId } from './types';
 
 const VIGNETTE_STYLE: React.CSSProperties = {
   background: `
@@ -19,59 +21,62 @@ const VIGNETTE_STYLE: React.CSSProperties = {
 
 function LoadingOverlay() {
   return (
-    <div
-      style={{
-        position: 'fixed',
-        inset: 0,
-        zIndex: 99,
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        background: 'rgba(2,5,8,0.75)',
-        backdropFilter: 'blur(4px)',
-      }}
-    >
-      <div
-        className="spin"
-        style={{
-          width: '38px',
-          height: '38px',
-          border: '2px solid rgba(34,197,94,0.2)',
-          borderTopColor: '#22c55e',
-          borderRadius: '50%',
-          marginBottom: '16px',
-        }}
-      />
-      <div
-        style={{
-          color: '#22c55e',
-          fontFamily: 'var(--font-mono)',
-          fontSize: '11px',
-          letterSpacing: '3px',
-        }}
-      >
-        LOADING GLOBE...
+    <div style={{
+      position: 'fixed', inset: 0, zIndex: 99,
+      display: 'flex', flexDirection: 'column',
+      alignItems: 'center', justifyContent: 'center',
+      background: 'rgba(2,5,8,0.75)', backdropFilter: 'blur(4px)',
+    }}>
+      <div className="spin" style={{
+        width: '38px', height: '38px',
+        border: '2px solid rgba(34,197,94,0.2)', borderTopColor: '#22c55e',
+        borderRadius: '50%', marginBottom: '16px',
+      }} />
+      <div style={{ color: '#22c55e', fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '3px' }}>
+        LOADING DATA...
       </div>
     </div>
   );
 }
 
 export default function App() {
-  const { data, loading } = useDataLoader();
+  const { data, loading, error, retry } = useDataLoader();
 
-  const minYear = data?.years[0] ?? 1990;
-  const maxYear = data?.years[data.years.length - 1] ?? 2025;
-
+  const [activeLayer, setActiveLayer] = useState<LayerId>('population');
   const [year, setYear] = useState(2025);
   const [playing, setPlaying] = useState(false);
   const [selectedCode, setSelectedCode] = useState<string | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  useEffect(() => {
-    if (data) setYear((y) => Math.max(minYear, Math.min(maxYear, y)));
-  }, [data, minYear, maxYear]);
+  // Layer-aware year bounds
+  const activeLayerData = useMemo(
+    () => data?.layers.get(activeLayer),
+    [data, activeLayer]
+  );
+  const minYear = activeLayerData?.years[0] ?? 1990;
+  const maxYear = activeLayerData?.years.slice(-1)[0] ?? 2025;
 
+  // Snap to 2025 for population/forest, max year for everything else
+  const handleLayerChange = useCallback((newLayer: LayerId) => {
+    setActiveLayer(newLayer);
+    if (newLayer === 'population' || newLayer === 'forest') {
+      setYear(2025);
+    } else {
+      const ld = data?.layers.get(newLayer);
+      if (ld) setYear(ld.years.slice(-1)[0]);
+    }
+  }, [data]);
+
+  // Clamp year when data loads
+  useEffect(() => {
+    if (activeLayerData) {
+      const lo = activeLayerData.years[0];
+      const hi = activeLayerData.years.slice(-1)[0];
+      setYear((y) => Math.max(lo, Math.min(hi, y)));
+    }
+  }, [activeLayerData]);
+
+  // Playback
   useEffect(() => {
     if (playing) {
       intervalRef.current = setInterval(() => {
@@ -90,26 +95,38 @@ export default function App() {
     if (year >= maxYear && playing) setPlaying(false);
   }, [year, maxYear, playing]);
 
-  const dataForYear = useMemo(
-    () => (data ? getDataForYear(data, year) : new Map()),
-    [data, year]
-  );
+  // Keyboard shortcuts
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (e.code === 'Space' && e.target === document.body) {
+        e.preventDefault();
+        togglePlay();
+      }
+      if (e.code === 'Escape') setSelectedCode(null);
+    }
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  });
 
-  const globalStats = useMemo(() => getGlobalStats(year), [year]);
+  const dataForYear = useMemo(
+    () => (data ? getDataForYear(data, activeLayer, year) : new Map()),
+    [data, activeLayer, year]
+  );
 
   const selectedCountry = useMemo<SelectedCountry | null>(() => {
     if (!selectedCode || !data) return null;
-    let entity = selectedCode;
-    for (const [name, code] of data.nameToCode) {
-      if (code === selectedCode) { entity = name; break; }
-    }
-    const yearMap = data.byCode.get(selectedCode);
-    if (!yearMap) return null;
-    const history = Array.from(yearMap.entries())
-      .map(([y, share]) => ({ year: y, share }))
-      .sort((a, b) => a.year - b.year);
-    return { code: selectedCode, entity, history };
+    const entity = data.codeToName.get(selectedCode) ?? selectedCode;
+    const region = data.regions.get(selectedCode);
+    return { code: selectedCode, entity, region };
   }, [selectedCode, data]);
+
+  // Data availability note
+  const isForestMaxYear = 2025; // forest goes to 2025
+  const layerMaxYear = maxYear;
+  const dataNote = layerMaxYear < isForestMaxYear
+    ? `* Data available till ${layerMaxYear}`
+    : undefined;
+  const isProjected = activeLayer === 'population' && year >= POPULATION_PROJECTION_START;
 
   function togglePlay() {
     if (!playing && year >= maxYear) setYear(minYear);
@@ -122,30 +139,29 @@ export default function App() {
 
       <GlobeVisualization
         dataForYear={dataForYear}
+        activeLayer={activeLayer}
         selectedCode={selectedCode}
         onCountrySelect={setSelectedCode}
         playing={playing}
+        year={year}
       />
 
       <Header year={year} />
 
-      <LeftPanel
-        coverage={globalStats.coverage}
-        lostSince2000={globalStats.lostSince2000}
-        lossBarWidth={globalStats.lossBarWidth}
-        coverageBarWidth={globalStats.coverageBarWidth}
-      />
+      <LeftPanel activeLayer={activeLayer} data={data} year={year} />
 
       <AnimatePresence mode="wait">
-        {selectedCountry ? (
+        {selectedCountry && data ? (
           <CountryDetailPanel
             key="detail"
             selected={selectedCountry}
+            data={data}
+            activeLayer={activeLayer}
             year={year}
             onClose={() => setSelectedCode(null)}
           />
         ) : (
-          <RightPanel key="legend" />
+          <RightPanel key={`legend-${activeLayer}`} activeLayer={activeLayer} />
         )}
       </AnimatePresence>
 
@@ -154,11 +170,16 @@ export default function App() {
         minYear={minYear}
         maxYear={maxYear}
         playing={playing}
+        activeLayer={activeLayer}
+        dataNote={dataNote}
+        isProjected={isProjected}
         onYearChange={setYear}
         onPlayToggle={togglePlay}
+        onLayerChange={handleLayerChange}
       />
 
       {loading && <LoadingOverlay />}
+      {error && !loading && <ErrorOverlay message={error} onRetry={retry} />}
     </div>
   );
 }

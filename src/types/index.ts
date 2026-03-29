@@ -1,28 +1,27 @@
-export interface ForestRow {
-  entity: string;
-  code: string;
-  year: number;
-  share: number; // % of global forest
-}
+export type LayerId = 'forest' | 'co2' | 'energy' | 'hdi' | 'population';
 
 export interface CountryYearData {
   code: string;
-  share: number;
-  share1990: number;
-  relativeChange: number; // (share - share1990) / share1990 * 100
+  rawValue: number;   // actual data value (tonnes, %, index, etc.)
+  colorValue: number; // normalized value used for coloring
+}
+
+export interface LayerData {
+  byCode: Map<string, Map<number, number>>;
+  years: number[];     // sorted array of years with data
+  globalMin: number;
+  globalMax: number;
 }
 
 export interface ProcessedData {
-  rows: ForestRow[];
-  // code -> year -> share
-  byCode: Map<string, Map<number, number>>;
-  // entity name -> code
+  layers: Map<LayerId, LayerData>;
   nameToCode: Map<string, string>;
-  years: number[];
+  codeToName: Map<string, string>;
+  regions: Map<string, string>; // ISO code -> OWID region name
 }
 
 export interface SelectedCountry {
   code: string;
   entity: string;
-  history: { year: number; share: number }[];
+  region?: string;
 }

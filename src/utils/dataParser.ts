@@ -1,81 +1,115 @@
-import type { ProcessedData, CountryYearData } from '../types';
+import type { ProcessedData, CountryYearData, LayerId } from '../types';
 
-/**
- * Returns a Map<code, CountryYearData> for the given year.
- */
+// Soft caps for normalisation — values above these get clamped to 1
+const LAYER_SOFT_MAX: Partial<Record<LayerId, number>> = {
+  co2: 20,
+  energy: 20000,
+  hdi: 1,
+};
+
+// Log-normalise population (max ~1.45B, China/India)
+const POP_LOG_MAX = Math.log10(1.5e9);
+
 export function getDataForYear(
   data: ProcessedData,
+  layerId: LayerId,
   year: number
 ): Map<string, CountryYearData> {
   const result = new Map<string, CountryYearData>();
+  const layerData = data.layers.get(layerId);
+  if (!layerData) return result;
 
-  for (const [code, yearMap] of data.byCode) {
-    const share = yearMap.get(year);
-    const share1990 = yearMap.get(1990);
+  for (const [code, yearMap] of layerData.byCode) {
+    const rawValue = yearMap.get(year);
+    if (rawValue == null) continue;
 
-    if (share == null || share1990 == null) continue;
+    let colorValue: number;
 
-    const relativeChange =
-      share1990 !== 0 ? ((share - share1990) / share1990) * 100 : 0;
+    if (layerId === 'forest') {
+      const base = yearMap.get(1990);
+      if (base == null || base === 0) continue;
+      colorValue = ((rawValue - base) / base) * 100; // relativeChange %
+    } else if (layerId === 'population') {
+      colorValue = Math.log10(Math.max(1, rawValue)) / POP_LOG_MAX;
+    } else {
+      const softMax = LAYER_SOFT_MAX[layerId] ?? layerData.globalMax;
+      colorValue = softMax > 0 ? Math.max(0, Math.min(1, rawValue / softMax)) : 0;
+    }
 
-    result.set(code, { code, share, share1990, relativeChange });
+    result.set(code, { code, rawValue, colorValue });
   }
 
   return result;
 }
 
-/**
- * Returns a color string based on the country's relative change and selection state.
- */
 export function getCountryColor(
-  data: CountryYearData | undefined,
+  d: CountryYearData | undefined,
+  layerId: LayerId,
   isSelected: boolean
 ): string {
   if (isSelected) return 'rgba(255,255,255,0.95)';
-  if (!data) return 'rgba(30,58,38,0.55)';       // slate-ish dark green
+  if (!d) return 'rgba(20,32,42,0.55)';
 
-  const rc = data.relativeChange;
-  if (rc > 10)  return 'rgba(5,150,105,0.88)';   // emerald-600
-  if (rc > 2)   return 'rgba(22,163,74,0.88)';   // green-600
-  if (rc > -2)  return 'rgba(34,197,94,0.82)';   // green-500
-  if (rc > -10) return 'rgba(245,158,11,0.85)';  // amber-500
-  if (rc > -25) return 'rgba(234,88,12,0.85)';   // orange-600
-  return 'rgba(220,38,38,0.85)';                  // red-600
+  const cv = d.colorValue;
+
+  switch (layerId) {
+    case 'forest': {
+      if (cv > 10)  return 'rgba(5,150,105,0.88)';
+      if (cv > 2)   return 'rgba(22,163,74,0.88)';
+      if (cv > -2)  return 'rgba(34,197,94,0.82)';
+      if (cv > -10) return 'rgba(245,158,11,0.85)';
+      if (cv > -25) return 'rgba(234,88,12,0.85)';
+      return 'rgba(220,38,38,0.85)';
+    }
+    case 'co2': {
+      // lower = better → green → red
+      if (cv < 0.05) return 'rgba(22,163,74,0.85)';
+      if (cv < 0.15) return 'rgba(132,204,22,0.85)';
+      if (cv < 0.35) return 'rgba(234,179,8,0.85)';
+      if (cv < 0.75) return 'rgba(249,115,22,0.85)';
+      return 'rgba(220,38,38,0.85)';
+    }
+    case 'energy': {
+      // blue palette by consumption
+      if (cv < 0.025) return 'rgba(186,230,253,0.75)';
+      if (cv < 0.1)   return 'rgba(56,189,248,0.82)';
+      if (cv < 0.25)  return 'rgba(2,132,199,0.88)';
+      if (cv < 0.75)  return 'rgba(29,78,216,0.88)';
+      return 'rgba(79,70,229,0.9)';
+    }
+    case 'hdi': {
+      // higher = better → red → green (raw value, 0–1)
+      const v = d.rawValue;
+      if (v < 0.55) return 'rgba(220,38,38,0.85)';
+      if (v < 0.65) return 'rgba(249,115,22,0.85)';
+      if (v < 0.75) return 'rgba(234,179,8,0.85)';
+      if (v < 0.85) return 'rgba(132,204,22,0.85)';
+      return 'rgba(22,163,74,0.88)';
+    }
+    case 'population': {
+      // light mint → teal → dark navy (OWID style choropleth)
+      if (cv < 0.2)  return 'rgba(213,241,228,0.80)';
+      if (cv < 0.4)  return 'rgba(132,210,188,0.84)';
+      if (cv < 0.6)  return 'rgba(62,171,173,0.88)';
+      if (cv < 0.8)  return 'rgba(30,115,161,0.90)';
+      return 'rgba(10,51,107,0.93)';
+    }
+    default:
+      return 'rgba(34,197,94,0.82)';
+  }
 }
 
-/**
- * Returns an altitude value based on the country's relative change and selection state.
- */
 export function getCountryAltitude(
-  data: CountryYearData | undefined,
+  d: CountryYearData | undefined,
+  layerId: LayerId,
   isSelected: boolean
 ): number {
   if (isSelected) return 0.06;
-  if (!data) return 0.003;
-
-  const rc = data.relativeChange;
-  if (rc < -25) return 0.015;
-  if (rc < -10) return 0.01;
+  if (!d) return 0.003;
+  if (layerId === 'forest') {
+    const rc = d.colorValue;
+    if (rc < -25) return 0.015;
+    if (rc < -10) return 0.01;
+  }
   return 0.005;
-}
-
-/**
- * Returns global forest coverage statistics for a given year.
- */
-export function getGlobalStats(year: number): {
-  coverage: string;
-  lostSince2000: string;
-  lossBarWidth: number;
-  coverageBarWidth: number;
-} {
-  const yp = year - 2000;
-  const coverageNum = Math.max(0, 31.6 - yp * 0.04);
-  const lostNum = Math.max(0, yp * 0.2);
-
-  const coverage = coverageNum.toFixed(1);
-  const lostSince2000 = lostNum.toFixed(1);
-  const lossBarWidth = Math.min((lostNum / 5.0) * 100, 100);
-  const coverageBarWidth = coverageNum;
-
-  return { coverage, lostSince2000, lossBarWidth, coverageBarWidth };
 }
