@@ -31,6 +31,13 @@ export function GlobeVisualization({
 }: Props) {
   const globeEl = useRef<any>(null);
   const [countries, setCountries] = useState<{ features: any[] }>({ features: [] });
+  const [dims, setDims] = useState({ w: window.innerWidth, h: window.innerHeight });
+
+  useEffect(() => {
+    function update() { setDims({ w: window.innerWidth, h: window.innerHeight }); }
+    window.addEventListener('resize', update);
+    return () => window.removeEventListener('resize', update);
+  }, []);
 
   useEffect(() => {
     fetch(GEOJSON_URL)
@@ -103,9 +110,11 @@ export function GlobeVisualization({
   );
 
   return (
-    <div className="fixed inset-0 globe-container" style={{ background: '#000000' }}>
+    <div className="fixed inset-0 globe-container bg-black">
       <Globe
         ref={globeEl}
+        width={dims.w}
+        height={dims.h}
         backgroundColor="#000000"
         globeMaterial={GLOBE_MATERIAL}
         atmosphereColor="rgba(211, 121, 25, 0.81)"

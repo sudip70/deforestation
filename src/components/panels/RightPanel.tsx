@@ -13,65 +13,54 @@ export function RightPanel({ activeLayer }: Props) {
   const config = LAYER_MAP.get(activeLayer)!;
 
   return (
-    <div>
-      <motion.aside
-        key={activeLayer}
-        initial={{ x: 20, opacity: 0 }}
-        animate={{ x: 0, opacity: 1 }}
-        exit={{ x: 20, opacity: 0 }}
-        transition={{ duration: 0.25 }}
-      >
-        <PanelShell style={{ width: '178px' }}>
-          {/* Title */}
-          <div style={{ marginBottom: '12px' }}>
-            <PanelLabel>{config.legendTitle}</PanelLabel>
-            <div style={{ marginTop: '8px' }}>
-              <SectionDivider gradient />
+    <motion.aside
+      key={activeLayer}
+      initial={{ x: 20, opacity: 0 }}
+      animate={{ x: 0, opacity: 1 }}
+      exit={{ x: 20, opacity: 0 }}
+      transition={{ duration: 0.25 }}
+    >
+      <PanelShell className="w-[148px] md:w-[178px]">
+        {/* Title */}
+        <div className="mb-3">
+          <PanelLabel>{config.legendTitle}</PanelLabel>
+          <div className="mt-2">
+            <SectionDivider gradient />
+          </div>
+        </div>
+
+        {/* Legend items */}
+        <div className="flex flex-col gap-[7px]">
+          {config.legendItems.map((item) => (
+            <div key={item.name} className="flex items-center gap-[7px]">
+              <div
+                className="w-3 h-3 rounded-[2px] flex-shrink-0 border border-white/[0.08]"
+                style={{ background: item.color }}
+              />
+              <span className="font-display text-[10px] font-semibold text-slate-100 flex-1">
+                {item.name}
+              </span>
+              <span className="font-mono text-[9px] text-slate-100/45 whitespace-nowrap">
+                {item.range}
+              </span>
             </div>
-          </div>
+          ))}
+        </div>
 
-          {/* Legend items — color + text in same row */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '7px' }}>
-            {config.legendItems.map((item) => (
-              <div key={item.name} style={{ display: 'flex', alignItems: 'center', gap: '7px' }}>
-                <div style={{
-                  width: '12px', height: '12px', borderRadius: '2px', flexShrink: 0,
-                  background: item.color, border: '1px solid rgba(255,255,255,0.08)',
-                }} />
-                <span style={{
-                  fontFamily: 'var(--font-display)', fontSize: '10px', fontWeight: 600,
-                  color: '#e2e8f0', flex: 1,
-                }}>
-                  {item.name}
-                </span>
-                <span style={{
-                  fontFamily: 'var(--font-mono)', fontSize: '9px',
-                  color: 'rgba(226,232,240,0.45)', whiteSpace: 'nowrap',
-                }}>
-                  {item.range}
-                </span>
-              </div>
-            ))}
-          </div>
-
-          {/* No-data indicator */}
-          <div style={{ marginTop: '12px' }}>
-            <SectionDivider />
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '10px' }}>
-            <div style={{
-              width: '12px', height: '12px', borderRadius: '2px', flexShrink: 0,
-              background: 'rgba(20,32,42,0.55)', border: '1px solid rgba(255,255,255,0.08)',
-            }} />
-            <span style={{
-              fontFamily: 'var(--font-mono)', fontSize: '9px',
-              color: 'rgba(226,232,240,0.4)',
-            }}>
-              No data
-            </span>
-          </div>
-        </PanelShell>
-      </motion.aside>
-    </div>
+        {/* No-data indicator */}
+        <div className="mt-3">
+          <SectionDivider />
+        </div>
+        <div className="flex items-center gap-[6px] mt-[10px]">
+          <div
+            className="w-3 h-3 rounded-[2px] flex-shrink-0 border border-white/[0.08]"
+            style={{ background: 'rgba(20,32,42,0.55)' }}
+          />
+          <span className="font-mono text-[9px] text-slate-100/40">
+            No data
+          </span>
+        </div>
+      </PanelShell>
+    </motion.aside>
   );
 }

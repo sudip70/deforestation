@@ -22,40 +22,24 @@ export function YearSlider({ year, minYear, maxYear, onYearChange }: Props) {
   const ticks = computeTicks(minYear, maxYear);
 
   return (
-    <div style={{ flex: 1 }}>
-      <div style={{ position: 'relative', height: '4px', marginBottom: '8px' }}>
+    <div className="flex-1">
+      <div className="relative h-[4px] mb-2">
+        <div className="absolute inset-0 bg-white/[0.08] rounded-sm" />
         <div
-          style={{
-            position: 'absolute', inset: 0,
-            background: 'rgba(255,255,255,0.08)', borderRadius: '2px',
-          }}
-        />
-        <div
-          style={{
-            position: 'absolute', left: 0, top: 0, bottom: 0,
-            width: `${progress}%`,
-            background: 'linear-gradient(to right, #15803d, #22c55e)',
-            borderRadius: '2px', pointerEvents: 'none', transition: 'width 0.15s',
-          }}
+          className="absolute left-0 top-0 bottom-0 rounded-sm pointer-events-none transition-[width] duration-150"
+          style={{ width: `${progress}%`, background: 'linear-gradient(to right, #15803d, #22c55e)' }}
         />
         <input
           type="range"
-          className="slider-input"
+          className="slider-input absolute inset-0 w-full h-[4px]"
           min={minYear}
           max={maxYear}
           value={year}
           onChange={(e) => onYearChange(parseInt(e.target.value))}
-          style={{ position: 'absolute', inset: 0, width: '100%', height: '4px' }}
         />
       </div>
 
-      <div
-        style={{
-          display: 'flex', justifyContent: 'space-between',
-          fontFamily: 'var(--font-mono)', fontSize: '9px',
-          letterSpacing: '1px', color: 'rgba(226,232,240,0.55)',
-        }}
-      >
+      <div className="flex justify-between font-mono text-[9px] tracking-[1px] text-slate-100/55">
         {ticks.map((t) => <span key={t}>{t}</span>)}
       </div>
     </div>

@@ -10,83 +10,26 @@ export function Header({ year }: Props) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ delay: 0.3 }}
-      style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        zIndex: 30,
-        padding: '20px 28px 0',
-      }}
+      className="fixed top-0 left-0 right-0 z-30 pt-4 md:pt-5 px-5 md:px-7"
     >
-      {/* Left + right anchored with flexbox, center absolutely positioned */}
-      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
-        {/* Brand — left */}
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '9px',
-            fontFamily: 'var(--font-mono)',
-            fontSize: '11px',
-            letterSpacing: '2px',
-            color: 'rgba(226,232,240,0.55)',
-            textTransform: 'uppercase',
-            paddingTop: '6px',
-          }}
-        >
-          <span
-            style={{
-              width: '7px',
-              height: '7px',
-              borderRadius: '50%',
-              background: '#22c55e',
-              boxShadow: '0 0 8px #22c55e',
-              flexShrink: 0,
-            }}
-          />
-          Earth Observatory
+      <div className="flex items-start justify-between">
+        {/* Brand */}
+        <div className="flex items-center gap-[9px] font-mono text-[10px] md:text-[11px] tracking-[2px] text-slate-100/55 uppercase pt-[6px]">
+          <span className="pulse-dot w-[7px] h-[7px] rounded-full bg-green-500 flex-shrink-0"
+            style={{ boxShadow: '0 0 8px #22c55e' }} />
+          <span className="hidden sm:inline">Earth Observatory</span>
         </div>
-
         <div />
       </div>
 
-      {/* Year — truly centered via absolute */}
-      <div
-        style={{
-          position: 'absolute',
-          top: '20px',
-          left: 0,
-          right: 0,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          pointerEvents: 'none',
-        }}
-      >
-        <div
-          style={{
-            fontFamily: 'var(--font-mono)',
-            fontSize: '9px',
-            letterSpacing: '4px',
-            color: 'rgba(226,232,240,0.55)',
-            marginBottom: '2px',
-          }}
-        >
+      {/* Year — truly centered */}
+      <div className="absolute top-4 md:top-5 left-0 right-0 flex flex-col items-center pointer-events-none">
+        <div className="font-mono text-[9px] tracking-[4px] text-slate-100/55 mb-[2px]">
           MONITORING YEAR
         </div>
         <div
-          style={{
-            fontFamily: 'var(--font-display)',
-            fontSize: '64px',
-            fontWeight: 700,
-            lineHeight: 1,
-            letterSpacing: '-2px',
-            background: 'linear-gradient(160deg, #ffffff 30%, #4ade80 100%)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            backgroundClip: 'text',
-          }}
+          className="font-display text-[40px] md:text-[64px] font-bold leading-none tracking-[-2px] bg-clip-text text-transparent"
+          style={{ background: 'linear-gradient(160deg, #ffffff 30%, #4ade80 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}
         >
           {year}
         </div>

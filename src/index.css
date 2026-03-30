@@ -7,6 +7,11 @@
   --font-mono: 'Space Mono', monospace;
 }
 
+html, body {
+  height: 100%;
+  width: 100%;
+}
+
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
@@ -75,9 +80,13 @@ body {
   cursor: pointer;
 }
 
-/* Globe cursor */
+/* Globe cursor + touch */
+.globe-container {
+  touch-action: none;
+}
 .globe-container canvas {
   cursor: grab;
+  touch-action: none;
 }
 .globe-container canvas:active {
   cursor: grabbing;

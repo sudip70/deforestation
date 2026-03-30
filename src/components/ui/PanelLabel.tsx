@@ -4,15 +4,7 @@ interface Props {
 
 export function PanelLabel({ children }: Props) {
   return (
-    <div
-      style={{
-        fontFamily: 'var(--font-mono)',
-        fontSize: '8.5px',
-        letterSpacing: '3px',
-        color: 'rgba(226,232,240,0.55)',
-        textTransform: 'uppercase' as const,
-      }}
-    >
+    <div className="font-mono text-[8.5px] tracking-[3px] text-slate-100/55 uppercase">
       {children}
     </div>
   );

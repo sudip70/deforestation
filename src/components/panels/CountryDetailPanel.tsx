@@ -46,8 +46,8 @@ export function CountryDetailPanel({ selected, data, activeLayer, year, onClose 
   const changeColor =
     changePct == null ? 'rgba(226,232,240,0.55)'
     : activeLayer === 'forest' || activeLayer === 'hdi'
-      ? changePct >= 0 ? '#4ade80' : '#f87171'   // higher = better
-      : changePct <= 0 ? '#4ade80' : '#f87171';   // lower = better (co2, poverty, etc.)
+      ? changePct >= 0 ? '#4ade80' : '#f87171'
+      : changePct <= 0 ? '#4ade80' : '#f87171';
 
   const changeStr =
     changePct == null ? '—'
@@ -55,134 +55,100 @@ export function CountryDetailPanel({ selected, data, activeLayer, year, onClose 
     : `${changePct.toFixed(1)}%`;
 
   return (
-    <div>
-      <motion.div
-        initial={{ x: 300, opacity: 0 }}
-        animate={{ x: 0, opacity: 1 }}
-        exit={{ x: 300, opacity: 0 }}
-        transition={{ type: 'spring', damping: 28, stiffness: 280 }}
+    <motion.div
+      initial={{ x: 300, opacity: 0 }}
+      animate={{ x: 0, opacity: 1 }}
+      exit={{ x: 300, opacity: 0 }}
+      transition={{ type: 'spring', damping: 28, stiffness: 280 }}
+    >
+      <PanelShell
+        className="w-[min(180px,calc(100vw-24px))] md:w-[220px] max-h-[calc(100vh-220px)] md:max-h-[calc(100vh-160px)] overflow-y-auto relative"
+        style={{ background: 'rgba(6,12,20,0.92)' }}
       >
-        <PanelShell style={{
-          width: '220px',
-          maxHeight: 'calc(100vh - 160px)',
-          overflowY: 'auto',
-          background: 'rgba(6,12,20,0.92)',
-          position: 'relative',
-        }}>
-          {/* Close */}
-          <button
-            onClick={onClose}
-            style={{
-              position: 'absolute', top: '12px', right: '12px',
-              background: 'rgba(255,255,255,0.05)',
-              border: '1px solid rgba(255,255,255,0.1)',
-              borderRadius: '6px', color: 'rgba(226,232,240,0.55)',
-              width: '24px', height: '24px',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              cursor: 'pointer', fontSize: '12px', transition: 'background 0.15s',
-            }}
-          >
-            <FiX size={12} />
-          </button>
+        {/* Close */}
+        <button
+          onClick={onClose}
+          className="absolute top-3 right-3 w-6 h-6 flex items-center justify-center bg-white/[0.05] border border-white/10 rounded-md text-slate-100/55 cursor-pointer transition-colors hover:bg-white/[0.1]"
+        >
+          <FiX size={12} />
+        </button>
 
-          {/* Country name */}
-          <div style={{
-            fontFamily: 'var(--font-display)', fontSize: '17px', fontWeight: 700,
-            color: config.chartColor, lineHeight: 1.2,
-            marginBottom: '2px', paddingRight: '28px',
-          }}>
-            {selected.entity}
-          </div>
+        {/* Country name */}
+        <div
+          className="font-display text-[15px] md:text-[17px] font-bold leading-tight mb-[2px] pr-7"
+          style={{ color: config.chartColor }}
+        >
+          {selected.entity}
+        </div>
 
-          {/* Code + region */}
-          <div style={{
-            fontFamily: 'var(--font-mono)', fontSize: '9px', letterSpacing: '2px',
-            color: 'rgba(226,232,240,0.4)', marginBottom: '4px',
-          }}>
-            {selected.code}
-            {selected.region && (
-              <span style={{ marginLeft: '6px', letterSpacing: '1px' }}>
-                · {selected.region}
-              </span>
-            )}
-          </div>
-
-          {/* Active layer badge */}
-          <div style={{
-            display: 'inline-flex', alignItems: 'center', gap: '4px',
-            marginBottom: '14px',
-            background: 'rgba(255,255,255,0.05)',
-            border: '1px solid rgba(255,255,255,0.08)',
-            borderRadius: '10px', padding: '2px 8px',
-          }}>
-            <config.Icon size={10} />
-            <span style={{
-              fontFamily: 'var(--font-mono)', fontSize: '8px',
-              letterSpacing: '1px', color: 'rgba(226,232,240,0.55)',
-            }}>
-              {config.label.toUpperCase()}
-            </span>
-          </div>
-
-          <div style={{ marginBottom: '14px' }}>
-            <SectionDivider />
-          </div>
-
-          {/* Current value */}
-          <div style={{ marginBottom: '10px' }}>
-            <div style={{ marginBottom: '4px' }}>
-              <PanelLabel>
-                {config.label} {year}{isProjected ? ' *' : ''}
-              </PanelLabel>
-            </div>
-            <div style={{
-              fontFamily: 'var(--font-display)', fontSize: '22px', fontWeight: 700,
-              color: '#e2e8f0', lineHeight: 1,
-            }}>
-              {currentValue != null ? config.formatValue(currentValue) : '—'}
-            </div>
-            <div style={{
-              fontFamily: 'var(--font-mono)', fontSize: '9px',
-              color: 'rgba(226,232,240,0.4)', marginTop: '3px',
-            }}>
-              {isProjected ? '* UN projection' : config.unit}
-            </div>
-          </div>
-
-          {/* Change since baseline */}
-          <div style={{ marginBottom: '16px' }}>
-            <div style={{ marginBottom: '4px' }}>
-              <PanelLabel>Change Since {baselineYear ?? '—'}</PanelLabel>
-            </div>
-            <div style={{
-              fontFamily: 'var(--font-display)', fontSize: '22px', fontWeight: 700,
-              color: changeColor, lineHeight: 1,
-            }}>
-              {changeStr}
-            </div>
-          </div>
-
-          <div style={{ marginBottom: '12px' }}>
-            <SectionDivider />
-          </div>
-
-          {/* Chart */}
-          {chartData.length > 1 && (
-            <>
-              <div style={{ marginBottom: '8px' }}>
-                <PanelLabel>Historical Trend</PanelLabel>
-              </div>
-              <HistoryChart
-                data={chartData}
-                currentYear={year}
-                lineColor={config.chartColor}
-                formatValue={config.formatValue}
-                projectionStartYear={config.projectionStartYear}
-              />
-            </>
+        {/* Code + region */}
+        <div className="font-mono text-[9px] tracking-[2px] text-slate-100/40 mb-1">
+          {selected.code}
+          {selected.region && (
+            <span className="ml-[6px] tracking-[1px]">· {selected.region}</span>
           )}
-        </PanelShell>
-      </motion.div>
-    </div>
+        </div>
+
+        {/* Layer badge */}
+        <div className="inline-flex items-center gap-1 mb-3 md:mb-[14px] bg-white/[0.05] border border-white/[0.08] rounded-[10px] px-2 py-[2px]">
+          <config.Icon size={10} />
+          <span className="font-mono text-[8px] tracking-[1px] text-slate-100/55">
+            {config.label.toUpperCase()}
+          </span>
+        </div>
+
+        <div className="mb-3 md:mb-[14px]">
+          <SectionDivider />
+        </div>
+
+        {/* Current value */}
+        <div className="mb-[10px]">
+          <div className="mb-1">
+            <PanelLabel>
+              {config.label} {year}{isProjected ? ' *' : ''}
+            </PanelLabel>
+          </div>
+          <div className="font-display text-[20px] md:text-[22px] font-bold text-slate-100 leading-none">
+            {currentValue != null ? config.formatValue(currentValue) : '—'}
+          </div>
+          <div className="font-mono text-[9px] text-slate-100/40 mt-[3px]">
+            {isProjected ? '* UN projection' : config.unit}
+          </div>
+        </div>
+
+        {/* Change */}
+        <div className="mb-4">
+          <div className="mb-1">
+            <PanelLabel>Change Since {baselineYear ?? '—'}</PanelLabel>
+          </div>
+          <div
+            className="font-display text-[20px] md:text-[22px] font-bold leading-none"
+            style={{ color: changeColor }}
+          >
+            {changeStr}
+          </div>
+        </div>
+
+        <div className="mb-3">
+          <SectionDivider />
+        </div>
+
+        {/* Chart */}
+        {chartData.length > 1 && (
+          <>
+            <div className="mb-2">
+              <PanelLabel>Historical Trend</PanelLabel>
+            </div>
+            <HistoryChart
+              data={chartData}
+              currentYear={year}
+              lineColor={config.chartColor}
+              formatValue={config.formatValue}
+              projectionStartYear={config.projectionStartYear}
+            />
+          </>
+        )}
+      </PanelShell>
+    </motion.div>
   );
 }

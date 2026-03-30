@@ -23,70 +23,65 @@ export function LeftPanel({ activeLayer, data, year }: Props) {
   }, [activeLayer, data, year]);
 
   return (
-    <div>
-      <motion.aside
-        key={activeLayer}
-        initial={{ x: 20, opacity: 0 }}
-        animate={{ x: 0, opacity: 1 }}
-        exit={{ x: 20, opacity: 0 }}
-        transition={{ duration: 0.25 }}
-      >
-        <PanelShell style={{ width: '172px' }}>
-          <div style={{ marginBottom: '18px' }}>
-            <PanelLabel>
-              <config.Icon size={11} style={{ display: 'inline', verticalAlign: 'middle', marginRight: '5px' }} />
-              {config.label}
-            </PanelLabel>
-            <div style={{ marginTop: '8px' }}>
-              <SectionDivider gradient />
-            </div>
+    <motion.aside
+      key={activeLayer}
+      initial={{ x: 20, opacity: 0 }}
+      animate={{ x: 0, opacity: 1 }}
+      exit={{ x: 20, opacity: 0 }}
+      transition={{ duration: 0.25 }}
+    >
+      <PanelShell className="w-[148px] md:w-[172px]">
+        <div className="mb-4 md:mb-[18px]">
+          <PanelLabel>
+            <config.Icon size={11} style={{ display: 'inline', verticalAlign: 'middle', marginRight: '5px' }} />
+            {config.label}
+          </PanelLabel>
+          <div className="mt-2">
+            <SectionDivider gradient />
           </div>
+        </div>
 
-          {stats ? (
-            <>
-              <StatBlock
-                value={stats.primary.value}
-                unit={stats.primary.unit}
-                label={stats.primary.label}
-                color={stats.primary.color}
-                barWidth={stats.primary.barWidth}
-                barColor={stats.primary.barColor}
-              />
+        {stats ? (
+          <>
+            <StatBlock
+              value={stats.primary.value}
+              unit={stats.primary.unit}
+              label={stats.primary.label}
+              color={stats.primary.color}
+              barWidth={stats.primary.barWidth}
+              barColor={stats.primary.barColor}
+            />
 
-              <div style={{ margin: '14px 0' }}>
-                <SectionDivider />
-              </div>
-
-              <StatBlock
-                value={stats.secondary.value}
-                unit={stats.secondary.unit}
-                label={stats.secondary.label}
-                color={stats.secondary.color}
-                barWidth={stats.secondary.barWidth}
-                barColor={stats.secondary.barColor}
-              />
-
-              <div style={{ margin: '14px 0' }}>
-                <SectionDivider />
-              </div>
-
-              <StatBlock
-                value={stats.tertiary.value}
-                unit={stats.tertiary.unit}
-                label={stats.tertiary.label}
-                color={stats.tertiary.color}
-              />
-            </>
-          ) : (
-            <div style={{
-              fontFamily: 'var(--font-mono)', fontSize: '9px',
-              color: 'rgba(226,232,240,0.3)', letterSpacing: '1px',
-            }}>
-              Loading...
+            <div className="my-3 md:my-[14px]">
+              <SectionDivider />
             </div>
-          )}
-        </PanelShell>
-      </motion.aside>
-    </div>
+
+            <StatBlock
+              value={stats.secondary.value}
+              unit={stats.secondary.unit}
+              label={stats.secondary.label}
+              color={stats.secondary.color}
+              barWidth={stats.secondary.barWidth}
+              barColor={stats.secondary.barColor}
+            />
+
+            <div className="my-3 md:my-[14px]">
+              <SectionDivider />
+            </div>
+
+            <StatBlock
+              value={stats.tertiary.value}
+              unit={stats.tertiary.unit}
+              label={stats.tertiary.label}
+              color={stats.tertiary.color}
+            />
+          </>
+        ) : (
+          <div className="font-mono text-[9px] text-slate-100/30 tracking-[1px]">
+            Loading...
+          </div>
+        )}
+      </PanelShell>
+    </motion.aside>
   );
 }

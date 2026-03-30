@@ -9,27 +9,11 @@ export function PlayButton({ playing, onClick }: Props) {
   return (
     <button
       onClick={onClick}
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: '7px',
-        width: '108px',
-        background: playing ? 'rgba(248,113,113,0.1)' : 'rgba(34,197,94,0.12)',
-        border: playing
-          ? '1px solid rgba(248,113,113,0.4)'
-          : '1px solid rgba(34,197,94,0.4)',
-        color: playing ? '#f87171' : '#22c55e',
-        padding: '9px 0',
-        borderRadius: '24px',
-        cursor: 'pointer',
-        fontFamily: 'var(--font-mono)',
-        fontSize: '11px',
-        letterSpacing: '2px',
-        whiteSpace: 'nowrap',
-        flexShrink: 0,
-        transition: 'background 0.2s, border-color 0.2s, color 0.2s',
-      }}
+      className={`flex items-center justify-center gap-[7px] w-[90px] md:w-[108px] py-[9px] rounded-full cursor-pointer font-mono text-[10px] md:text-[11px] tracking-[2px] whitespace-nowrap flex-shrink-0 transition-all duration-200 ${
+        playing
+          ? 'bg-red-400/10 border border-red-400/40 text-red-400'
+          : 'bg-green-500/[0.12] border border-green-500/40 text-green-500'
+      }`}
     >
       {playing ? <FiPause size={12} /> : <FiPlay size={12} />}
       <span>{playing ? 'PAUSE' : 'PLAY'}</span>

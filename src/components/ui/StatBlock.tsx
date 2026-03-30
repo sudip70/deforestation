@@ -10,61 +10,29 @@ interface Props {
 export function StatBlock({ value, unit, label, color, barWidth, barColor }: Props) {
   return (
     <div>
-      <div
-        style={{ display: 'flex', alignItems: 'baseline', gap: '3px', marginBottom: '3px' }}
-      >
+      <div className="flex items-baseline gap-[3px] mb-[3px]">
         <div
-          style={{
-            fontFamily: 'var(--font-display)',
-            fontSize: '30px',
-            fontWeight: 700,
-            lineHeight: 1,
-            color,
-          }}
+          className="font-display text-[26px] md:text-[30px] font-bold leading-none"
+          style={{ color }}
         >
           {value}
         </div>
-        <div
-          style={{
-            fontFamily: 'var(--font-mono)',
-            fontSize: '10px',
-            color: 'rgba(226,232,240,0.55)',
-            marginBottom: '1px',
-          }}
-        >
+        <div className="font-mono text-[10px] text-slate-100/55 mb-[1px]">
           {unit}
         </div>
       </div>
 
       <div
-        style={{
-          fontFamily: 'var(--font-mono)',
-          fontSize: '9px',
-          letterSpacing: '1px',
-          color: 'rgba(226,232,240,0.55)',
-          marginBottom: barWidth !== undefined ? '7px' : 0,
-        }}
+        className={`font-mono text-[9px] tracking-[1px] text-slate-100/55 ${barWidth !== undefined ? 'mb-[7px]' : ''}`}
       >
         {label}
       </div>
 
       {barWidth !== undefined && (
-        <div
-          style={{
-            height: '3px',
-            background: 'rgba(255,255,255,0.06)',
-            borderRadius: '2px',
-            overflow: 'hidden',
-          }}
-        >
+        <div className="h-[3px] bg-white/[0.06] rounded-sm overflow-hidden">
           <div
-            style={{
-              height: '100%',
-              borderRadius: '2px',
-              background: barColor ?? color,
-              width: `${barWidth}%`,
-              transition: 'width 0.6s ease',
-            }}
+            className="h-full rounded-sm transition-[width] duration-[600ms] ease-in-out"
+            style={{ background: barColor ?? color, width: `${barWidth}%` }}
           />
         </div>
       )}

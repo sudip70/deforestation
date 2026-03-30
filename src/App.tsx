@@ -21,18 +21,12 @@ const VIGNETTE_STYLE: React.CSSProperties = {
 
 function LoadingOverlay() {
   return (
-    <div style={{
-      position: 'fixed', inset: 0, zIndex: 99,
-      display: 'flex', flexDirection: 'column',
-      alignItems: 'center', justifyContent: 'center',
-      background: 'rgba(2,5,8,0.75)', backdropFilter: 'blur(4px)',
-    }}>
-      <div className="spin" style={{
-        width: '38px', height: '38px',
-        border: '2px solid rgba(34,197,94,0.2)', borderTopColor: '#22c55e',
-        borderRadius: '50%', marginBottom: '16px',
-      }} />
-      <div style={{ color: '#22c55e', fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '3px' }}>
+    <div className="fixed inset-0 z-[99] flex flex-col items-center justify-center bg-[rgba(2,5,8,0.75)] backdrop-blur-sm">
+      <div
+        className="spin w-[38px] h-[38px] rounded-full mb-4"
+        style={{ border: '2px solid rgba(34,197,94,0.2)', borderTopColor: '#22c55e' }}
+      />
+      <div className="text-green-500 font-mono text-[11px] tracking-[3px]">
         LOADING DATA...
       </div>
     </div>
@@ -49,7 +43,6 @@ export default function App() {
   const [selectedCode, setSelectedCode] = useState<string | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // Layer-aware year bounds
   const activeLayerData = useMemo(
     () => data?.layers.get(activeLayer),
     [data, activeLayer]
@@ -57,7 +50,6 @@ export default function App() {
   const minYear = activeLayerData?.years[0] ?? 1990;
   const maxYear = activeLayerData?.years.slice(-1)[0] ?? 2025;
 
-  // Snap to 2025 for population/forest, max year for everything else
   const handleLayerChange = useCallback((newLayer: LayerId) => {
     setActiveLayer(newLayer);
     if (newLayer === 'population' || newLayer === 'forest') {
@@ -68,7 +60,6 @@ export default function App() {
     }
   }, [data]);
 
-  // Clamp year when data loads
   useEffect(() => {
     if (activeLayerData) {
       const lo = activeLayerData.years[0];
@@ -77,7 +68,6 @@ export default function App() {
     }
   }, [activeLayerData]);
 
-  // Playback
   useEffect(() => {
     if (playing) {
       intervalRef.current = setInterval(() => {
@@ -96,7 +86,6 @@ export default function App() {
     if (year >= maxYear && playing) setPlaying(false);
   }, [year, maxYear, playing]);
 
-  // Keyboard shortcuts
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
       if (e.code === 'Space' && e.target === document.body) {
@@ -127,8 +116,8 @@ export default function App() {
   }
 
   return (
-    <div className="relative w-full h-screen overflow-hidden" style={{ background: '#000000' }}>
-      <div className="absolute inset-0 pointer-events-none" style={{ ...VIGNETTE_STYLE, zIndex: 2 }} />
+    <div className="relative w-full overflow-hidden bg-black" style={{ height: '100dvh' }}>
+      <div className="absolute inset-0 pointer-events-none z-[2]" style={VIGNETTE_STYLE} />
 
       <GlobeVisualization
         dataForYear={dataForYear}
@@ -141,30 +130,17 @@ export default function App() {
 
       <Header year={year} />
 
-      {/* Left center: layer category switcher */}
-      <div style={{
-        position: 'fixed',
-        left: '24px',
-        top: '50%',
-        transform: 'translateY(-50%)',
-        zIndex: 20,
-      }}>
+      {/* Desktop: layer switcher — left center */}
+      <div className="hidden md:block fixed left-6 top-1/2 -translate-y-1/2 z-20">
         <LayerSwitcher activeLayer={activeLayer} onChange={handleLayerChange} />
       </div>
 
-      {/* Right-middle: stats panel + legend/detail stacked */}
-      <div style={{
-        position: 'fixed',
-        top: '50%',
-        right: '24px',
-        transform: 'translateY(-50%)',
-        zIndex: 20,
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'flex-end',
-        gap: '12px',
-      }}>
-        <LeftPanel activeLayer={activeLayer} data={data} year={year} />
+      {/* Right panels — right center on desktop, top-right on mobile */}
+      <div className="fixed right-3 md:right-6 top-[72px] md:top-1/2 md:-translate-y-1/2 z-20 flex flex-col items-end gap-3">
+        {/* Stats panel — desktop only */}
+        <div className="hidden md:block">
+          <LeftPanel activeLayer={activeLayer} data={data} year={year} />
+        </div>
 
         <AnimatePresence mode="wait">
           {selectedCountry && data ? (
@@ -182,6 +158,7 @@ export default function App() {
         </AnimatePresence>
       </div>
 
+      {/* Controls (includes mobile layer switcher) */}
       <Controls
         year={year}
         minYear={minYear}
@@ -191,6 +168,8 @@ export default function App() {
         onYearChange={setYear}
         onPlayToggle={togglePlay}
         onSpeedChange={setPlaySpeed}
+        activeLayer={activeLayer}
+        onLayerChange={handleLayerChange}
       />
 
       {loading && <LoadingOverlay />}
