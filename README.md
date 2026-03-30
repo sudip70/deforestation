@@ -11,13 +11,6 @@ An interactive 3D globe dashboard visualizing various dataset obtained from [Our
 
 <br/>
 
-## Data
-
-The dashboard visualizes data from the [Food and Agriculture Organization of the United Nations (FAO)](https://www.fao.org/forest-resources-assessment/en/) via Our World in Data. The dataset includes:
-- **Coverage**: 1990–2025
-- **Metric**: Share of global forest area per country (% of total world forests)
-- **Countries**: 190+ nations tracked
-- **Source**: FAO Global Forest Resources Assessment 2025
 
 <br/>
 
@@ -44,7 +37,7 @@ npm run build
 
 ## Deployment
 
-The app is configured for [GitHub Pages](https://pages.github.com/) at `https://sudip70.github.io/deforestation/`.
+The app is configured for [GitHub Pages](https://pages.github.com/) at `https://sudip70.github.io/stats/`.
 
 ```bash
 npm run deploy
