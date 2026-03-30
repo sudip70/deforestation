@@ -10,7 +10,9 @@ function computeTicks(minYear: number, maxYear: number): number[] {
   const interval = range <= 40 ? 5 : range <= 80 ? 10 : range <= 150 ? 25 : 50;
   const ticks: number[] = [];
   const start = Math.ceil(minYear / interval) * interval;
+  if (start !== minYear) ticks.push(minYear);
   for (let y = start; y <= maxYear; y += interval) ticks.push(y);
+  if (ticks[ticks.length - 1] !== maxYear) ticks.push(maxYear);
   return ticks;
 }
 
