@@ -79,7 +79,7 @@ export function GlobeVisualization({
           <div style="color:${config.chartColor};font-size:13px;font-weight:600;
             margin-bottom:6px;font-family:var(--font-display);">${name}</div>
           <div style="display:flex;justify-content:space-between;font-size:10px;margin-bottom:3px;">
-            <span style="color:rgba(226,232,240,0.55);">${config.emoji} ${config.label}</span>
+            <span style="color:rgba(226,232,240,0.55);">${config.label}</span>
             <span style="color:#e2e8f0;">${valueStr}</span>
           </div>
           ${isProjected ? '<div style="font-size:9px;color:rgba(251,191,36,0.6);">~ UN projection</div>' : ''}

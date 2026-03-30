@@ -1,3 +1,5 @@
+import { FiPlay, FiPause } from 'react-icons/fi';
+
 interface Props {
   playing: boolean;
   onClick: () => void;
@@ -27,7 +29,7 @@ export function PlayButton({ playing, onClick }: Props) {
         transition: 'background 0.2s, border-color 0.2s',
       }}
     >
-      <span>{playing ? '⏸' : '▶'}</span>
+      {playing ? <FiPause size={12} /> : <FiPlay size={12} />}
       <span>{playing ? 'PAUSE' : 'PLAY'}</span>
     </button>
   );

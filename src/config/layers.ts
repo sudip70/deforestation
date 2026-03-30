@@ -1,4 +1,9 @@
+import type { IconType } from 'react-icons';
+import { FiUsers, FiZap, FiTrendingUp, FiWind } from 'react-icons/fi';
+import { FaTree } from 'react-icons/fa';
 import type { LayerId } from '../types';
+
+export { FiUsers, FiZap, FiTrendingUp, FiWind, FaTree };
 
 export interface LegendBucket {
   color: string;
@@ -9,7 +14,7 @@ export interface LegendBucket {
 export interface LayerConfig {
   id: LayerId;
   label: string;
-  emoji: string;
+  Icon: IconType;
   group: 'environment' | 'society' | 'development';
   unit: string;
   fileName: string;
@@ -29,7 +34,7 @@ export const LAYER_CONFIGS: LayerConfig[] = [
   {
     id: 'population',
     label: 'Population',
-    emoji: '👥',
+    Icon: FiUsers,
     group: 'society',
     unit: 'people',
     fileName: 'population-with-un-projections.csv',
@@ -54,7 +59,7 @@ export const LAYER_CONFIGS: LayerConfig[] = [
   {
     id: 'forest',
     label: 'Forest',
-    emoji: '🌲',
+    Icon: FaTree,
     group: 'environment',
     unit: '% of global forest',
     fileName: 'share-global-forest.csv',
@@ -75,7 +80,7 @@ export const LAYER_CONFIGS: LayerConfig[] = [
   {
     id: 'co2',
     label: 'CO₂',
-    emoji: '💨',
+    Icon: FiWind,
     group: 'environment',
     unit: 'tonnes per capita',
     fileName: 'co-emissions-per-capita.csv',
@@ -95,7 +100,7 @@ export const LAYER_CONFIGS: LayerConfig[] = [
   {
     id: 'energy',
     label: 'Energy',
-    emoji: '⚡',
+    Icon: FiZap,
     group: 'environment',
     unit: 'kWh per capita',
     fileName: 'per-capita-energy-use.csv',
@@ -115,7 +120,7 @@ export const LAYER_CONFIGS: LayerConfig[] = [
   {
     id: 'hdi',
     label: 'HDI',
-    emoji: '📈',
+    Icon: FiTrendingUp,
     group: 'development',
     unit: 'index (0 – 1)',
     fileName: 'human-development-index.csv',

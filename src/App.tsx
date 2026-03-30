@@ -9,7 +9,6 @@ import { RightPanel } from './components/panels/RightPanel';
 import { Controls } from './components/controls/Controls';
 import { CountryDetailPanel } from './components/panels/CountryDetailPanel';
 import { ErrorOverlay } from './components/ErrorOverlay';
-import { POPULATION_PROJECTION_START } from './config/layers';
 import type { SelectedCountry, LayerId } from './types';
 
 const VIGNETTE_STYLE: React.CSSProperties = {
@@ -120,14 +119,6 @@ export default function App() {
     return { code: selectedCode, entity, region };
   }, [selectedCode, data]);
 
-  // Data availability note
-  const isForestMaxYear = 2025; // forest goes to 2025
-  const layerMaxYear = maxYear;
-  const dataNote = layerMaxYear < isForestMaxYear
-    ? `* Data available till ${layerMaxYear}`
-    : undefined;
-  const isProjected = activeLayer === 'population' && year >= POPULATION_PROJECTION_START;
-
   function togglePlay() {
     if (!playing && year >= maxYear) setYear(minYear);
     setPlaying((p) => !p);
@@ -171,8 +162,6 @@ export default function App() {
         maxYear={maxYear}
         playing={playing}
         activeLayer={activeLayer}
-        dataNote={dataNote}
-        isProjected={isProjected}
         onYearChange={setYear}
         onPlayToggle={togglePlay}
         onLayerChange={handleLayerChange}

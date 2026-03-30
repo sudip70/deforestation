@@ -57,7 +57,7 @@ export function LayerSwitcher({ activeLayer, onChange }: Props) {
               }
             }}
           >
-            <span style={{ fontSize: '14px' }}>{layer.emoji}</span>
+            <layer.Icon size={14} />
             <span>{layer.label}</span>
           </button>
         );

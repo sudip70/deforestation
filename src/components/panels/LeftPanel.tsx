@@ -37,7 +37,8 @@ export function LeftPanel({ activeLayer, data, year }: Props) {
         <PanelShell style={{ width: '172px' }}>
           <div style={{ marginBottom: '18px' }}>
             <PanelLabel>
-              {config.emoji} {config.label}
+              <config.Icon size={11} style={{ display: 'inline', verticalAlign: 'middle', marginRight: '5px' }} />
+              {config.label}
             </PanelLabel>
             <div style={{ marginTop: '8px' }}>
               <SectionDivider gradient />

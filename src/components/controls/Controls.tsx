@@ -9,8 +9,6 @@ interface Props {
   maxYear: number;
   playing: boolean;
   activeLayer: LayerId;
-  dataNote?: string;        // e.g. "* Data available to 2023"
-  isProjected?: boolean;    // for population 2024+
   onYearChange: (year: number) => void;
   onPlayToggle: () => void;
   onLayerChange: (layer: LayerId) => void;
@@ -22,8 +20,6 @@ export function Controls({
   maxYear,
   playing,
   activeLayer,
-  dataNote,
-  isProjected,
   onYearChange,
   onPlayToggle,
   onLayerChange,
@@ -62,42 +58,6 @@ export function Controls({
           </div>
         </div>
 
-        {/* Data note row */}
-        {(dataNote || isProjected) && (
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'center',
-              marginTop: '6px',
-              gap: '12px',
-            }}
-          >
-            {dataNote && (
-              <span
-                style={{
-                  fontFamily: 'var(--font-mono)',
-                  fontSize: '9px',
-                  letterSpacing: '1px',
-                  color: 'rgba(226,232,240,0.4)',
-                }}
-              >
-                {dataNote}
-              </span>
-            )}
-            {isProjected && (
-              <span
-                style={{
-                  fontFamily: 'var(--font-mono)',
-                  fontSize: '9px',
-                  letterSpacing: '1px',
-                  color: 'rgba(251,191,36,0.7)',
-                }}
-              >
-                ~ UN PROJECTED DATA
-              </span>
-            )}
-          </div>
-        )}
       </div>
     </div>
   );

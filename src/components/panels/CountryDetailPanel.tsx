@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { FiX } from 'react-icons/fi';
 import { motion } from 'framer-motion';
 import { PanelShell } from '../ui/PanelShell';
 import { PanelLabel } from '../ui/PanelLabel';
@@ -84,7 +85,7 @@ export function CountryDetailPanel({ selected, data, activeLayer, year, onClose 
               cursor: 'pointer', fontSize: '12px', transition: 'background 0.15s',
             }}
           >
-            ✕
+            <FiX size={12} />
           </button>
 
           {/* Country name */}
@@ -117,7 +118,7 @@ export function CountryDetailPanel({ selected, data, activeLayer, year, onClose 
             border: '1px solid rgba(255,255,255,0.08)',
             borderRadius: '10px', padding: '2px 8px',
           }}>
-            <span style={{ fontSize: '10px' }}>{config.emoji}</span>
+            <config.Icon size={10} />
             <span style={{
               fontFamily: 'var(--font-mono)', fontSize: '8px',
               letterSpacing: '1px', color: 'rgba(226,232,240,0.55)',

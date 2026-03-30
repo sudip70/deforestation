@@ -48,34 +48,7 @@ export function Header({ year }: Props) {
           Earth Observatory
         </div>
 
-        {/* Live badge — right */}
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '7px',
-            fontFamily: 'var(--font-mono)',
-            fontSize: '10px',
-            letterSpacing: '2px',
-            color: '#22c55e',
-            border: '1px solid rgba(34,197,94,0.3)',
-            padding: '5px 12px',
-            borderRadius: '20px',
-            background: 'rgba(34,197,94,0.06)',
-          }}
-        >
-          <span
-            className="pulse-dot"
-            style={{
-              width: '6px',
-              height: '6px',
-              borderRadius: '50%',
-              background: '#22c55e',
-              flexShrink: 0,
-            }}
-          />
-          LIVE DATA
-        </div>
+        <div />
       </div>
 
       {/* Year — truly centered via absolute */}
