@@ -9,6 +9,8 @@ import { RightPanel } from './components/panels/RightPanel';
 import { Controls } from './components/controls/Controls';
 import { LayerSwitcher } from './components/controls/LayerSwitcher';
 import { CountryDetailPanel } from './components/panels/CountryDetailPanel';
+import { DataSourcesModal } from './components/modals/DataSourcesModal';
+import { AboutModal } from './components/modals/AboutModal';
 import { ErrorOverlay } from './components/ErrorOverlay';
 import type { SelectedCountry, LayerId } from './types';
 
@@ -41,6 +43,8 @@ export default function App() {
   const [playing, setPlaying] = useState(false);
   const [playSpeed, setPlaySpeed] = useState(1);
   const [selectedCode, setSelectedCode] = useState<string | null>(null);
+  const [showDataSources, setShowDataSources] = useState(false);
+  const [showAbout, setShowAbout] = useState(false);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const activeLayerData = useMemo(
@@ -92,7 +96,11 @@ export default function App() {
         e.preventDefault();
         togglePlay();
       }
-      if (e.code === 'Escape') setSelectedCode(null);
+      if (e.code === 'Escape') {
+        setSelectedCode(null);
+        setShowDataSources(false);
+        setShowAbout(false);
+      }
     }
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
@@ -128,7 +136,7 @@ export default function App() {
         year={year}
       />
 
-      <Header year={year} />
+      <Header year={year} onInfoClick={() => setShowDataSources(true)} onAboutClick={() => setShowAbout(true)} />
 
       {/* Desktop: layer switcher — left center */}
       <div className="hidden md:block fixed left-6 top-1/2 -translate-y-1/2 z-20">
@@ -171,6 +179,20 @@ export default function App() {
         activeLayer={activeLayer}
         onLayerChange={handleLayerChange}
       />
+
+      {/* Data Sources Modal */}
+      <AnimatePresence>
+        {showDataSources && (
+          <DataSourcesModal onClose={() => setShowDataSources(false)} />
+        )}
+      </AnimatePresence>
+
+      {/* About Modal */}
+      <AnimatePresence>
+        {showAbout && (
+          <AboutModal onClose={() => setShowAbout(false)} />
+        )}
+      </AnimatePresence>
 
       {loading && <LoadingOverlay />}
       {error && !loading && <ErrorOverlay message={error} onRetry={retry} />}
